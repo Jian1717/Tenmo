@@ -10,7 +10,7 @@ public class TransferService {
     @Autowired
     TransferRepository transferRepository;
 
-    public Transfer createOrUpdateTransfer(Transfer transfer){
+    public Transfer  createTransfer(Transfer transfer){
         return transferRepository.save(transfer);
     }
 }

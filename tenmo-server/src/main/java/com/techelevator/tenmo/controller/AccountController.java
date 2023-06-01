@@ -3,9 +3,7 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.entity.Account;
 import com.techelevator.tenmo.entity.Transfer;
 import com.techelevator.tenmo.entity.User;
-import com.techelevator.tenmo.service.AccountService;
-import com.techelevator.tenmo.service.TransferService;
-import com.techelevator.tenmo.service.UserService;
+import com.techelevator.tenmo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +21,11 @@ public class AccountController {
     UserService userService;
     @Autowired
     TransferService transferService;
+    @Autowired
+    TransferStatusService transferStatusService;
+    @Autowired
+    TransferTypeService transferTypeService;
+
     @GetMapping("getUserAccount")
     public List<Account> getUserAccount(@RequestBody User user){
         return accountService.getAccountByUser(user);
@@ -36,21 +39,29 @@ public class AccountController {
         return userService.getAllUser();
     }
     @PreAuthorize("hasRole('USER')")
-    @PostMapping("makeATransfer")
-    public Transfer makeATransfer(Transfer transfer, Principal principal){
-        String username=principal.getName();
-        if(transfer.getAccount_from().getUser().getUsername().equals(username)){
-            if(transfer.getAccount_to().equals(transfer.getAccount_from())){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Couldn't transfer to same account.");
-            }else {
-                if(transfer.getAccount_from().getBalance()<transfer.getAmount()){
-                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Not enough founding ");
-                }else {
-                return transferService.createOrUpdateTransfer(transfer);
-                }
-            }
-        }else {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Please select your own account to begin the transfer transaction.");
+    @ResponseStatus(HttpStatus.CREATED )
+    @PostMapping(value = "makeATransfer", params = {"account_from","account_to","amount"})
+    public Transfer makeATransfer(@RequestParam int account_from,
+                                                             @RequestParam int account_to,
+                                                             @RequestParam double amount,
+                                                             Principal principal){
+        if(account_from==account_to){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Couldn't transfer to same account.");
         }
+        Account from = accountService.getAccountByID(account_from);
+        if (from.getBalance()<amount){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Not enough founding ");
+        }
+        Account to =accountService.getAccountByID(account_to);
+        Transfer transfer = new Transfer();
+        transfer.setAccount_to(to);
+        transfer.setAccount_from(from);
+        if(from.getUser().getUsername().equals(principal.getName())){
+            transfer.setTransferType(transferTypeService.findByDescription("Send"));
+        }else {
+            transfer.setTransferType(transferTypeService.findByDescription("Request"));
+        }
+        transfer.setTransferStatus(transferStatusService.findByDescription("Pending"));
+        return transferService.createTransfer(transfer);
     }
 }
