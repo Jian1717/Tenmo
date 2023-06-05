@@ -15,9 +15,12 @@ public class AccountService {
     public AccountService() {
     }
     public List<Account> getAccountByUser(User user){
-        return accountRepository.findByUser(user);
+        return accountRepository.findAllByUser(user);
     }
     public Account getAccountByID(int accountId){
         return accountRepository.findById(accountId);
+    }
+    public Account saveAccount(Account account){
+        return  accountRepository.save(account);
     }
 }

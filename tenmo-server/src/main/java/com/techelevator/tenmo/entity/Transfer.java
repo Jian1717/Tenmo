@@ -1,7 +1,6 @@
 package com.techelevator.tenmo.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.Min;
 
 
 @Entity
@@ -12,7 +11,6 @@ public class Transfer {
     @Column(name = "transfer_id")
     private int transfer_id;
     @Column(name = "amount")
-    @Min(value = 0,message = "can't transfer negative amount")
     private double amount;
     @ManyToOne
     @JoinColumn(name = "account_to", referencedColumnName = "account_id")

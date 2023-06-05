@@ -5,6 +5,7 @@ import com.techelevator.tenmo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 
 @Service
@@ -14,7 +15,9 @@ public class UserService {
     public UserService(){
 
     }
-
+    public User getCurrentUser(Principal principal){
+        return userRepository.findByUsername(principal.getName());
+    }
     public List<User> getAllUser(){
         return userRepository.findAll();
     }

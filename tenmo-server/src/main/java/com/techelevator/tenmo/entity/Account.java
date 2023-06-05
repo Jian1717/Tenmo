@@ -3,7 +3,6 @@ package com.techelevator.tenmo.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 
