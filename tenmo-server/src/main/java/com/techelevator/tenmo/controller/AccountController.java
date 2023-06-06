@@ -113,7 +113,24 @@ public class AccountController {
         }else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Not an authorized user to approve or reject this transfer ");
         }
-            }
+    }
+
+    /*
+        Following is Ezequiel's approach on checking balance using the existing method of this class verifyCurrentUser
+     */
+
+    @GetMapping("checkBalance/{accountId}")
+    public double checkBalance(@PathVariable int accountId, Principal principal) {
+        Account account = accountService.getAccountByID(accountId);
+
+        if (account != null && verifyCurrentUser(account, principal)) {
+            return account.getBalance();
+        } else {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access to account");
+        }
+    }
+
+
     private boolean verifyCurrentUser(Account account, Principal principal){
         return account.getUser().getUsername().equals(principal.getName());
     }
