@@ -10,6 +10,6 @@ Get		getTransfer/{id}		return a spercific transfer				N/A			id:int
 Post		makeATransfer			create a new transfer.					account_from:int, 	N/A
 													account_to:int ,
 													amount:double		
-Post		confirmTransfer			Update transfer status for a specific transfer that in  transfer_id:int, 	N/A
+Put		confirmTransfer			Update transfer status for a specific transfer that in  transfer_id:int, 	N/A
 						pending state. And update the balance in both account 	transferStatus:String
 						if it's approved.	
