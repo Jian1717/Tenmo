@@ -4,6 +4,10 @@ import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
+import org.springframework.http.*;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.HttpClientErrorException;
+
 
 public class App {
 
@@ -84,10 +88,35 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance() {
-		// TODO Auto-generated method stub
-		
-	}
+	private void viewCurrentBalance() {  //still working on it -ezequiel
+
+                // Set the URL of the API endpoint
+                String url = API_BASE_URL + "checkBalance/" + currentUser.getUser().getId();
+                RestTemplate restTemplate = new RestTemplate();
+                //  create an instance of HttpHeaders and set the bearer token
+                HttpHeaders headers = new HttpHeaders();
+                headers.setBearerAuth(currentUser.getToken());
+                // GET request using restTemplate.exchange(), passing the URL, HTTP method, HttpEntity with the headers, and the expected response type (Double.class in this case).
+                try {
+                    ResponseEntity<Double> response = restTemplate.exchange(
+                            url,
+                            HttpMethod.GET,
+                            new HttpEntity<>(headers),
+                            Double.class
+                    );
+
+                    if (response.getStatusCode() == HttpStatus.OK) {
+                        double balance = response.getBody();
+                        System.out.println("Your current balance is: $" + balance);
+                    } else {
+                        System.out.println("Error retrieving balance. Status code: " + response.getStatusCodeValue());
+                    }
+                } catch (HttpClientErrorException.Unauthorized ex) {
+                    System.out.println("Unauthorized access to account.");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
 
 	private void viewTransferHistory() {
 		// TODO Auto-generated method stub
