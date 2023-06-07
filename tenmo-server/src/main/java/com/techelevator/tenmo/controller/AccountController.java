@@ -64,7 +64,7 @@ public class AccountController {
                                                              @RequestParam int account_to,
                                                              @RequestParam double amount,
                                                              Principal principal){
-        //check if it's trying to send or request money to same user account
+        //check if it's trying to send or request money from/to same user account
         if(account_from==account_to){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Couldn't transfer to same account.");
         }
@@ -77,7 +77,7 @@ public class AccountController {
         Transfer transfer = new Transfer();
         transfer.setAccount_to(to);
         transfer.setAccount_from(from);
-        //check if current login user is sender.
+        //check if current login user is the sender.
         if(verifyCurrentUser(from,principal)){
             //check is the current user has enough money to send the money
             if (from.getBalance()<amount){
@@ -89,7 +89,7 @@ public class AccountController {
             //mark transfer type to request
             transfer.setTransferType(transferTypeService.findByDescription("Request"));
         }
-        //transfer status is always set to Pending in default
+        //transfer status is always set to pending in default
         transfer.setTransferStatus(transferStatusService.findByDescription("Pending"));
         transfer.setAmount(amount);
         //save new transfer to database
@@ -114,7 +114,7 @@ public class AccountController {
         if(verifyCurrentUser(transfer.getAccount_from(),principal)) {
             switch (transferStatus) {
                     case "Rejected":
-                        //mark transfer as rejected state and do nothing with account balance
+                        //mark transfer as rejected and do nothing with account balance
                         transfer.setTransferStatus(transferStatusService.findByDescription("Rejected"));
                         return transferService.saveTransfer(transfer);
                     case "Approved":
