@@ -26,36 +26,45 @@ public class AccountController {
     TransferStatusService transferStatusService;
     @Autowired
     TransferTypeService transferTypeService;
+
+
     /**return list of account that associated with current login user*/
     @GetMapping("getUserAccount")
     public List<Account> getUserAccount(Principal principal){
         return accountService.getAccountByUser(userService.getCurrentUser(principal));
     }
+
+
     /**return the account that match with searching account*/
     @GetMapping(value = "getUserAccount",params = "account_id")
     public Account getUserAccountByID(@RequestParam int account_id){
         return accountService.getAccountByID(account_id);
     }
+
     /**return list of all user that registered in the database*/
     @GetMapping("getAllUser")
     public List<User> getAllUser(){
         return userService.getAllUser();
     }
+
     /**return current login user*/
     @GetMapping("getCurrentUser")
     public User getCurrentUser(Principal principal){
         return userService.getCurrentUser(principal);
     }
+
     /**return list of transfers that matching with searching account*/
     @GetMapping("getAllTransferForAccount")
     public List<Transfer> getAllTransferForAccount(@RequestParam int account_id){
         return transferService.findAllTransferOfAccount(account_id);
     }
+
     /**return transfer that matching with searching transfer id*/
     @GetMapping("getTransfer/{id}")
     public Transfer getTransferById(@PathVariable int transferID){
         return transferService.findById(transferID);
     }
+
     /**created a new transfer by account_from, account_to and  transfer amount.
      * return created transfer*/
     @ResponseStatus(HttpStatus.CREATED )
@@ -136,21 +145,6 @@ public class AccountController {
             }
         }else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Not an authorized user to approve or reject this transfer ");
-        }
-    }
-
-    /*
-        Following is Ezequiel's approach on checking balance using the existing method of this class verifyCurrentUser
-     */
-
-    @GetMapping("checkBalance/{accountId}")
-    public double checkBalance(@PathVariable int accountId, Principal principal) {
-        Account account = accountService.getAccountByID(accountId);
-
-        if (account != null && verifyCurrentUser(account, principal)) {
-            return account.getBalance();
-        } else {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Unauthorized access to account");
         }
     }
 

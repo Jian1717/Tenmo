@@ -1,12 +1,18 @@
 package com.techelevator.tenmo;
 
+import com.techelevator.tenmo.entity.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
+import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.List;
 
 
 public class App {
@@ -89,36 +95,18 @@ public class App {
     }
 
 	private void viewCurrentBalance() {  //still working on it -ezequiel
+        AccountService accountService = new AccountService(currentUser);
+        List<Account> accounts = accountService.getAccount();
 
-                // Set the URL of the API endpoint
-                String url = API_BASE_URL + "checkBalance/" + currentUser.getUser().getId();
-                RestTemplate restTemplate = new RestTemplate();
-                //  create an instance of HttpHeaders and set the bearer token
-                HttpHeaders headers = new HttpHeaders();
-                headers.setBearerAuth(currentUser.getToken());
-                // GET request using restTemplate.exchange(), passing the URL, HTTP method, HttpEntity with the headers, and the expected response type (Double.class in this case).
-                try {
-                    ResponseEntity<Double> response = restTemplate.exchange(
-                            url,
-                            HttpMethod.GET,
-                            new HttpEntity<>(headers),
-                            Double.class
-                    );
+        for (Account account : accounts) {
+            // display balance for each account even though i think
+            System.out.println("Account ID: " + account.getAccount_id());
+            System.out.println("Account Balance: " + account.getBalance());
 
-                    if (response.getStatusCode() == HttpStatus.OK) {
-                        double balance = response.getBody();
-                        System.out.println("Your current balance is: $" + balance);
-                    } else {
-                        System.out.println("Error retrieving balance. Status code: " + response.getStatusCodeValue());
-                    }
-                } catch (HttpClientErrorException.Unauthorized ex) {
-                    System.out.println("Unauthorized access to account.");
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
+        }
+    }
 
-	private void viewTransferHistory() {
+        private void viewTransferHistory() {
 		// TODO Auto-generated method stub
 		
 	}
