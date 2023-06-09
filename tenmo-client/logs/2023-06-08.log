@@ -1,0 +1,4 @@
+2023-06-08T19:40:55.9821489 500 : [{"timestamp":"2023-06-08T23:40:55.941+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO tenmo_user (username, password_hash) VALUES (?, ?) RETU... (528 bytes)]
+2023-06-08T19:42:38.7825337 500 : [{"timestamp":"2023-06-08T23:42:38.745+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO tenmo_user (username, password_hash) VALUES (?, ?) RETU... (528 bytes)]
+2023-06-08T19:45:20.7439476 I/O error on POST request for "http://localhost:8080/register": Connection refused: connect; nested exception is java.net.ConnectException: Connection refused: connect
+2023-06-08T19:45:52.4564465 500 : [{"timestamp":"2023-06-08T23:45:52.419+00:00","status":500,"error":"Internal Server Error","message":"PreparedStatementCallback; SQL [INSERT INTO tenmo_user (username, password_hash) VALUES (?, ?) RETU... (528 bytes)]
