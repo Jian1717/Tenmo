@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.entity.Account;
+//import com.techelevator.tenmo.entity.Account;
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
