@@ -23,4 +23,8 @@ public class AccountService {
     public Account saveAccount(Account account){
         return  accountRepository.save(account);
     }
+
+    public Account updateAccountBalance(int id,double amount){
+       return accountRepository.updateBalance(id, amount) ;
+    }
 }
