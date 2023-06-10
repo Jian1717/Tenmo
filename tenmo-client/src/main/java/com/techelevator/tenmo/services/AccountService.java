@@ -23,7 +23,7 @@ public class AccountService {
     }
 
     public List<Account>  getAccount() {
-        String url = API_BASE_URL + "getUserAccount";
+        String url = API_BASE_URL + "user/account";
 
         ResponseEntity<List<Account>> response =
                 restTemplate.exchange(url, HttpMethod.GET, makeAuthEntity(),
