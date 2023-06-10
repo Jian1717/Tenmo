@@ -108,7 +108,7 @@ public class App {
 
         private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void viewPendingRequests() {
@@ -118,6 +118,15 @@ public class App {
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
+
+        AccountService accountService=new AccountService(currentUser);
+        List<Account> accounts = accountService.getAccount();
+        System.out.println(accounts);
+        int senderAccountId = consoleService.promptForInt("Enter your Account ID to send money from: ");
+        int recipientAccountId = consoleService.promptForInt("Enter the recipient's Account ID: ");
+        double amount = consoleService.promptForBigDecimal("Enter the amount to transfer: ").doubleValue();
+
+        accountService.transferFunds(senderAccountId, recipientAccountId, amount);
 		
 	}
 
