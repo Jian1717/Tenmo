@@ -2,6 +2,7 @@ package com.techelevator.tenmo;
 
 import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
@@ -12,6 +13,7 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -23,7 +25,7 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
-
+    private AccountService accountService;
     public static void main(String[] args) {
         App app = new App();
         app.run();
@@ -67,6 +69,8 @@ public class App {
         currentUser = authenticationService.login(credentials);
         if (currentUser == null) {
             consoleService.printErrorMessage();
+        }else {
+            accountService=new AccountService(currentUser);
         }
     }
 
@@ -108,7 +112,7 @@ public class App {
 
         private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	private void viewPendingRequests() {
@@ -118,11 +122,56 @@ public class App {
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
+
+
+        List<Account> senderAccountList =accountService.getAccount();
+        List<User> users=accountService.getListUsers();
+
+
+        consoleService.printAllAccounts(senderAccountList);
+        int senderAccountId =  consoleService.promptForInt("Enter which Account to send funds form: ");
+        consoleService.printAllUser(users);
+        int userId=consoleService.promptForInt("User ID: ");
+
+
+        List<Account> recipientAccountList=accountService.getAccountByUserId(userId);
+        consoleService.printAllAccounts(recipientAccountList);
+
+        int recipientAccountId = consoleService.promptForInt("Enter the recipient's Account ID: ");
+
+        double amount = consoleService.promptForBigDecimal("Enter the amount to transfer: ").doubleValue();
+
+        accountService.transferFunds(senderAccountId, recipientAccountId, amount);
 		
 	}
 
 	private void requestBucks() {
 		// TODO Auto-generated method stub
+        List<Account> accountList =accountService.getAccount();
+        List<User> userList = accountService.getListUsers();
+
+
+        consoleService.printAllAccounts(accountList);
+        int receiverAccountId =  consoleService.promptForInt("Enter which Account to add funds to: ");
+
+        consoleService.printAllUser(userList);
+
+        int userId=consoleService.promptForInt("Enter which user to request funds from by ID: ");
+
+
+        List<Account> senderAccountList=accountService.getAccountByUserId(userId);
+        consoleService.printAllAccounts(senderAccountList);
+
+        int senderAccountId = consoleService.promptForInt("Enter the senders Account ID: ");
+
+        double amount = consoleService.promptForBigDecimal("Enter the amount to transfer: ").doubleValue();
+
+        accountService.transferFunds( senderAccountId, receiverAccountId, amount);
+
+
+//implement how it is above tonight and push
+//
+
 		
 	}
 

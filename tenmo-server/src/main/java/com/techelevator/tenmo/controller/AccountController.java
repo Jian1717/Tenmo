@@ -33,8 +33,11 @@ public class AccountController {
     public List<Account> getUserAccount(Principal principal){
         return accountService.getAccountByUser(userService.getCurrentUser(principal));
     }
-
-
+    /**return list of account that associated with searching user*/
+    @GetMapping("user/{id}/account")
+    public List<Account> getUserAccountByUserID(@PathVariable int id){
+        return accountService.getAccountByUser(userService.getUserByID(id));
+    }
     /**return the account that match with searching account*/
     @GetMapping(value = "account/{id}")
     public Account getAccountByID(@PathVariable int id){
