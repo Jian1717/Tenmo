@@ -1,9 +1,12 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleService {
@@ -79,10 +82,35 @@ public class ConsoleService {
         }
     }
 
+
     public void pause() {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
+
+    public void printAllUser(List<User> userList){
+        System.out.println("-------------------------------------------\n" +
+                "Users\n" +
+                "ID          Name\n" +
+                "-------------------------------------------");
+        for(User user:userList){
+            System.out.print(user.getId()+"      ");
+            System.out.println(user.getUsername());
+        }
+    }
+    public void printAllAccounts(List<Account> accountList){
+        System.out.println("-------------------------------------------\n" +
+                "Account\n" +
+                "ID          Balance\n" +
+                "-------------------------------------------");
+        for(Account account:accountList){
+            System.out.print(account.getAccount_id()+"      ");
+            System.out.println(account.getBalance());
+
+        }
+            System.out.println("0: Exit");
+    }
+
 
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
