@@ -101,6 +101,7 @@ public class AccountController {
         Transfer transfer = new Transfer();
         transfer.setAccount_to(to);
         transfer.setAccount_from(from);
+        transfer.setTransferStatus(transferStatusService.findByDescription("Pending"));
         //check if current login user is the sender.
         if(verifyCurrentUser(from,principal)){
             //check is the current user has enough money to send the money
@@ -109,21 +110,25 @@ public class AccountController {
             }
             //mark transfer type to send
             transfer.setTransferType(transferTypeService.findByDescription("Send"));
+            transfer.setAmount(amount);
+            transfer= transferService.saveTransfer(transfer);
+            confirmTransfer(transfer.getTransfer_id(),"Approved",principal);
+            return transfer;
         }else {
             //mark transfer type to request
             transfer.setTransferType(transferTypeService.findByDescription("Request"));
+            transfer.setAmount(amount);
+            return transferService.saveTransfer(transfer);
         }
-        //transfer status is always set to pending in default
-        transfer.setTransferStatus(transferStatusService.findByDescription("Pending"));
-        transfer.setAmount(amount);
+
         //save new transfer to database
-        return transferService.saveTransfer(transfer);
+
     }
     /**Change a pending transfer to either approved or rejected state.
      * if the transfer is approved, deduct or add money to corresponding account.
      * return an executed transfer*/
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping(value = "transfer/confirmTransfer/{?}")
+    @PutMapping(value = "transfer/confirmTransfer/{transfer_id}")
     public Transfer confirmTransfer(@PathVariable int transfer_id,
                                         @RequestParam String transferStatus,
                                     Principal principal){

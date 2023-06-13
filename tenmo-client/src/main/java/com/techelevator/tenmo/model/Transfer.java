@@ -7,8 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Transfer {
-    private int transferId;
+    private int transfer_id;
     private double amount;
-    private Account accountFrom;
-    private Account accountTo;
+    private Account account_from;
+    private Account account_to;
+    private TransferType transferType;
+    private TransferStatus transferStatus;
 }

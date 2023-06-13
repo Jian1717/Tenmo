@@ -2,6 +2,7 @@ package com.techelevator.tenmo.services;
 
 
 import com.techelevator.tenmo.model.Account;
+import com.techelevator.tenmo.model.Transfer;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
@@ -45,6 +46,8 @@ public class ConsoleService {
         System.out.println("3: View your pending requests");
         System.out.println("4: Send TE bucks");
         System.out.println("5: Request TE bucks");
+        System.out.println("6: Deposit TE bucks");
+        System.out.println("7: Withdraw TE bucks");
         System.out.println("0: Exit");
         System.out.println();
     }
@@ -99,19 +102,48 @@ public class ConsoleService {
         }
     }
     public void printAllAccounts(List<Account> accountList){
-        System.out.println("-------------------------------------------\n" +
-                "Account\n" +
-                "ID          Balance\n" +
-                "-------------------------------------------");
-        for(Account account:accountList){
-            System.out.print(account.getAccount_id()+"      ");
-            System.out.println(account.getBalance());
-
-        }
-            System.out.println("0: Exit");
+        System.out.println("----------------------------------------------\n" + " Account");
+        System.out.printf(" %-20s  %-20s  %n", "Account ID", "Balance");
+        System.out.println("-------------------------------------------");
+        accountList.forEach(s -> System.out.printf(" %-20s  %-20s %n", s.getAccount_id(), s.getBalance()));
+        System.out.println("----------------------------------------------");
+    }
+    public void printAccount(Account account){
+        System.out.println("----------------------------------------------\n" + " Account");
+        System.out.printf(" %-20s  %-20s  %n", "Account ID", "Balance");
+        System.out.println("----------------------------------------------");
+        System.out.printf(" %-20s  %-20s %n", account.getAccount_id(), account.getBalance());
+        System.out.println("----------------------------------------------");
     }
 
-
+    public void printPendingTransfer(List<Transfer> transferList){
+        if(transferList.size()>0) {
+            System.out.println("----------------------------------------------\n" +" Pending Transfer");
+            System.out.printf(" %-20s  %-20s  %-20s %n", "ID:", "To:", "Amount:");
+            System.out.println("----------------------------------------------");
+            transferList.forEach(s -> System.out.printf(" %-20s  %-20s  %-20s %n", s.getTransfer_id(), s.getAccount_to().getAccount_id(), s.getAmount()));
+            System.out.println("----------------------------------------------");
+        }else {
+            System.out.println("No pending transfer at the moment");
+        }
+    }
+    public void printApproveOrReject(){
+        System.out.println("1: Approve");
+        System.out.println("2: Reject");
+        System.out.println("0: Don't approve or reject");
+        System.out.println("----------------------------------");
+    }
+    public void printTransferDetails(Transfer transfer){
+        System.out.println("----------------------------------------------");
+        System.out.println("Transfer Detail");
+        System.out.println("----------------------------------------------");
+        System.out.printf(" %-20s  %-20s %n", "ID: ", transfer.getTransfer_id());
+        System.out.printf(" %-20s  %-20s %n", "From: ", transfer.getAccount_from().getAccount_id());
+        System.out.printf(" %-20s  %-20s %n", "To: ", transfer.getAccount_to().getAccount_id());
+        System.out.printf(" %-20s  %-20s %n", "Type: ", transfer.getTransferType().getDescription());
+        System.out.printf(" %-20s  %-20s %n", "Status: ", transfer.getTransferStatus().getDescription());
+        System.out.printf(" %-20s  %-20s %n", "Amount: ", transfer.getAmount());
+    }
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
     }

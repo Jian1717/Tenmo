@@ -1,9 +1,6 @@
 package com.techelevator.tenmo;
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.User;
-import com.techelevator.tenmo.model.UserCredentials;
+import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
@@ -15,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class App {
@@ -23,7 +21,6 @@ public class App {
 
     private final ConsoleService consoleService = new ConsoleService();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
-
     private AuthenticatedUser currentUser;
     private AccountService accountService;
     public static void main(String[] args) {
@@ -89,6 +86,10 @@ public class App {
                 sendBucks();
             } else if (menuSelection == 5) {
                 requestBucks();
+            } else if (menuSelection == 6) {
+                depositBucks();
+            } else if (menuSelection == 7) {
+                withdrawBucks();
             } else if (menuSelection == 0) {
                 continue;
             } else {
@@ -98,7 +99,9 @@ public class App {
         }
     }
 
-	private void viewCurrentBalance() {  //still working on it -ezequiel
+
+
+    private void viewCurrentBalance() {  //still working on it -ezequiel
         AccountService accountService = new AccountService(currentUser);
         List<Account> accounts = accountService.getAccount();
 
@@ -116,9 +119,42 @@ public class App {
 	}
 
 	private void viewPendingRequests() {
-		// TODO Auto-generated method stub
-		
-	}
+        String description="";
+        List<Account> accountList= accountService.getAccount();
+        consoleService.printAllAccounts(accountList);
+        int accountID=consoleService.promptForInt("Please select an account id: ");
+        if(!checkForAccountID(accountID,accountList)){
+            System.out.println("Invalid account ID");
+            return;
+        }
+        List<Transfer> transferList = accountService.getAllTransferByAccount(accountID);
+        transferList=accountService.getTransferByTransferStatusAndTransferType(transferList,"Pending","Request");
+        transferList=transferList.stream().filter(s->s.getAccount_from().getAccount_id()==accountID).collect(Collectors.toList());
+        consoleService.printPendingTransfer(transferList);
+        if(transferList.size()==0){
+            return;
+        }
+        int transferID=consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
+        if(checkForZero(transferID)){
+            return;
+        }
+        consoleService.printApproveOrReject();
+        int userChoice=consoleService.promptForInt("Please choose an option: ");
+        try {
+        switch (userChoice){
+            case 1:
+                description="Approved";
+                consoleService.printTransferDetails(accountService.comfirmtransfer(transferID,description));
+                break;
+            case 2:
+                description="Rejected";
+                consoleService.printTransferDetails(accountService.comfirmtransfer(transferID,description));
+                break;
+        }
+        }catch (Exception e){
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
 
 	private void sendBucks() {
 		// TODO Auto-generated method stub
@@ -146,7 +182,6 @@ public class App {
 	}
 
 	private void requestBucks() {
-		// TODO Auto-generated method stub
         List<Account> accountList =accountService.getAccount();
         List<User> userList = accountService.getListUsers();
 
@@ -168,11 +203,50 @@ public class App {
 
         accountService.transferFunds( senderAccountId, receiverAccountId, amount);
 
-
-//implement how it is above tonight and push
-//
-
-		
 	}
 
+    private void withdrawBucks() {
+        List<Account> accountList= accountService.getAccount();
+        consoleService.printAllAccounts(accountList);
+        int accountID=consoleService.promptForInt("Please select an account id (0 to cancel): ");
+        if(checkForZero(accountID)){
+            return;
+        }
+        if(!checkForAccountID(accountID,accountList)){
+            System.out.println("Invalid account ID");
+            return;
+        }
+        double amount = consoleService.promptForBigDecimal("Enter withdraw amount: ").doubleValue();
+        try {
+           accountService.withdrawMoney(accountID,amount);
+        }catch (Exception e){
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
+
+    private void depositBucks() {
+        List<Account> accountList= accountService.getAccount();
+        consoleService.printAllAccounts(accountList);
+        int accountID=consoleService.promptForInt("Please select an account id (0 to cancel): ");
+        if(checkForZero(accountID)){
+            return;
+        }
+        if(!checkForAccountID(accountID,accountList)){
+            System.out.println("Invalid account ID");
+            return;
+        }
+        double amount = consoleService.promptForBigDecimal("Enter deposit amount: ").doubleValue();
+        try {
+            accountService.depositMoney(accountID,amount);
+        }catch (Exception e){
+            System.out.println(e.getLocalizedMessage());
+        }
+    }
+
+    private boolean checkForZero(double number){
+        return number==0;
+    }
+    private boolean checkForAccountID(int accountID, List<Account> accountList){
+        return accountList.stream().filter(s->s.getAccount_id()==accountID).collect(Collectors.toList()).size()>0;
+    }
 }

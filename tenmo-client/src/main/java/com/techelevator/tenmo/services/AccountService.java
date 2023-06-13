@@ -1,10 +1,7 @@
 package com.techelevator.tenmo.services;
 
 //import com.techelevator.tenmo.entity.Account;
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.*;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AccountService {
     private static final String API_BASE_URL = "http://localhost:8080/";
@@ -69,7 +67,34 @@ public class AccountService {
         users=response.getBody();
         return users;
     }
-
+    public List<Transfer> getAllTransferByAccount(int accountID){
+        List<Transfer> transferList = new ArrayList<Transfer>();
+        String url = API_BASE_URL + "account/"+accountID+"/getAllTransfer";
+        ResponseEntity<List<Transfer>> response = restTemplate.exchange(url, HttpMethod.GET,makeAuthEntity(),new ParameterizedTypeReference<List<Transfer>>() {});
+        transferList = response.getBody();
+        return transferList;
+    }
+    public Transfer comfirmtransfer(int transferID,String decision){
+        String url = API_BASE_URL + "transfer/confirmTransfer/"+transferID+"?transferStatus="+decision;
+        ResponseEntity<Transfer> response = restTemplate.exchange(url, HttpMethod.PUT,makeAuthEntity(),Transfer.class);
+        Transfer updateTransfer = response.getBody();
+        return updateTransfer;
+    }
+    public Account depositMoney(int accountID,double amount){
+        String url = API_BASE_URL + "account/"+accountID+"/depositMoney?amount="+amount;
+        ResponseEntity<Account> response = restTemplate.exchange(url, HttpMethod.PUT,makeAuthEntity(),Account.class);
+        Account updateAccount = response.getBody();
+        return updateAccount;
+    }
+    public Account withdrawMoney(int accountID,double amount){
+        String url = API_BASE_URL + "account/"+accountID+"/withdrawMoney?amount="+amount;
+        ResponseEntity<Account> response = restTemplate.exchange(url, HttpMethod.PUT,makeAuthEntity(),Account.class);
+        Account updateAccount = response.getBody();
+        return updateAccount;
+    }
+    public List<Transfer> getTransferByTransferStatusAndTransferType(List<Transfer> transferList , String transferStatus, String transferType ){
+        return transferList.stream().filter(s->s.getTransferStatus().getDescription().equals(transferStatus)&&s.getTransferType().getDescription().equals(transferType)).collect(Collectors.toList());
+    }
     private HttpEntity<Void> makeAuthEntity() {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authenticatedUser.getToken());
