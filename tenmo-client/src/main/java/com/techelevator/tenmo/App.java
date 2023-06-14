@@ -104,13 +104,13 @@ public class App {
     private void viewCurrentBalance() {  //still working on it -ezequiel
         AccountService accountService = new AccountService(currentUser);
         List<Account> accounts = accountService.getAccount();
-
-        for (Account account : accounts) {
+        consoleService.printAllAccounts(accounts);
+       /* for (Account account : accounts) {
             // display balance for each account even though i think
             System.out.println("Account ID: " + account.getAccount_id());
             System.out.println("Account Balance: " + account.getBalance());
+*/
 
-        }
     }
 
         private void viewTransferHistory() {
