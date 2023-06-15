@@ -91,24 +91,26 @@ public class ConsoleService {
         scanner.nextLine();
     }
 
-    public void printAllUser(List<User> userList){
+    public void printAllUser(List<User> userList) {
         System.out.println("-------------------------------------------\n" +
                 "Users\n" +
                 "ID          Name\n" +
                 "-------------------------------------------");
-        for(User user:userList){
-            System.out.print(user.getId()+"      ");
+        for (User user : userList) {
+            System.out.print(user.getId() + "      ");
             System.out.println(user.getUsername());
         }
     }
-    public void printAllAccounts(List<Account> accountList){
+
+    public void printAllAccounts(List<Account> accountList) {
         System.out.println("----------------------------------------------\n" + " Account");
         System.out.printf(" %-20s  %-20s  %n", "Account ID", "Balance");
         System.out.println("-------------------------------------------");
         accountList.forEach(s -> System.out.printf(" %-20s  %-20s %n", s.getAccount_id(), s.getBalance()));
         System.out.println("----------------------------------------------");
     }
-    public void printAccount(Account account){
+
+    public void printAccount(Account account) {
         System.out.println("----------------------------------------------\n" + " Account");
         System.out.printf(" %-20s  %-20s  %n", "Account ID", "Balance");
         System.out.println("----------------------------------------------");
@@ -116,24 +118,26 @@ public class ConsoleService {
         System.out.println("----------------------------------------------");
     }
 
-    public void printPendingTransfer(List<Transfer> transferList){
-        if(transferList.size()>0) {
-            System.out.println("----------------------------------------------\n" +" Pending Transfer");
+    public void printPendingTransfer(List<Transfer> transferList) {
+        if (transferList.size() > 0) {
+            System.out.println("----------------------------------------------\n" + " Pending Transfer");
             System.out.printf(" %-20s  %-20s  %-20s %n", "ID:", "To:", "Amount:");
             System.out.println("----------------------------------------------");
             transferList.forEach(s -> System.out.printf(" %-20s  %-20s  %-20s %n", s.getTransfer_id(), s.getAccount_to().getAccount_id(), s.getAmount()));
             System.out.println("----------------------------------------------");
-        }else {
+        } else {
             System.out.println("No pending transfer at the moment");
         }
     }
-    public void printApproveOrReject(){
+
+    public void printApproveOrReject() {
         System.out.println("1: Approve");
         System.out.println("2: Reject");
         System.out.println("0: Don't approve or reject");
         System.out.println("----------------------------------");
     }
-    public void printTransferDetails(Transfer transfer){
+
+    public void printTransferDetails(Transfer transfer) {
         System.out.println("----------------------------------------------");
         System.out.println("Transfer Detail");
         System.out.println("----------------------------------------------");
@@ -144,8 +148,24 @@ public class ConsoleService {
         System.out.printf(" %-20s  %-20s %n", "Status: ", transfer.getTransferStatus().getDescription());
         System.out.printf(" %-20s  %-20s %n", "Amount: ", transfer.getAmount());
     }
+
     public void printErrorMessage() {
         System.out.println("An error occurred. Check the log for details.");
     }
 
+
+    public void printTransferHistory(List<Transfer> transferList) {
+        if (transferList.size() > 0) {
+            System.out.println("----------------------------------------------\n");
+            System.out.printf(" %-20s  %-20s  %-20s  %-20s %n", "ID:", "From:", "To:", "Amount:");
+            System.out.println("----------------------------------------------");
+            transferList.forEach(s -> System.out.printf(" %-20s  %-20s  %-20s  %-20s %n", s.getTransfer_id(), s.getAccount_from().getAccount_id(), s.getAccount_to().getAccount_id(), s.getAmount()));
+            System.out.println("----------------------------------------------");
+        } else {
+            System.out.println("No transfer history at the moment");
+        }
+    }
+
 }
+
+

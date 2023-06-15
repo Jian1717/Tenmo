@@ -115,8 +115,18 @@ public class App {
 
         private void viewTransferHistory() {
 		// TODO Auto-generated method stub
-
-	}
+            List<Account> accountList= accountService.getAccount();
+            consoleService.printAllAccounts(accountList);
+            int accountID=consoleService.promptForInt("Please select an account id: ");
+            if(!checkForAccountID(accountID,accountList)){
+                System.out.println("Invalid account ID");
+                return;
+            }
+            List<Transfer> transfers = accountService.getAllTransferByAccount(accountID);
+            int transferIdChoice = consoleService.promptForInt("\nPlease enter transfer ID to view details (0 to cancel)");
+            transfers = transfers.stream().filter(s -> s.getTransfer_id() == transferIdChoice).collect(Collectors.toList());
+            consoleService.printTransferHistory(transfers);
+        }
 
 	private void viewPendingRequests() {
         String description="";
