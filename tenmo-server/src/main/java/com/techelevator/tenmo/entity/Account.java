@@ -15,7 +15,6 @@ public class Account {
     private int account_id;
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnore
     private User user;
     @Column(name = "balance")
     private double balance;

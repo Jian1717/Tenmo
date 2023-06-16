@@ -156,11 +156,12 @@ public class ConsoleService {
 
     public void printTransferHistory(List<Transfer> transferList) {
         if (transferList.size() > 0) {
-            System.out.println("----------------------------------------------\n");
+            System.out.println("--------------------------------------------------------------------------------------------\n");
+            System.out.println("Transfer\n");
             System.out.printf(" %-20s  %-20s  %-20s  %-20s %n", "ID:", "From:", "To:", "Amount:");
-            System.out.println("----------------------------------------------");
-            transferList.forEach(s -> System.out.printf(" %-20s  %-20s  %-20s  %-20s %n", s.getTransfer_id(), s.getAccount_from().getAccount_id(), s.getAccount_to().getAccount_id(), s.getAmount()));
-            System.out.println("----------------------------------------------");
+            System.out.println("--------------------------------------------------------------------------------------------");
+            transferList.forEach(s -> System.out.printf(" %-20s %-20s %-20s %-20s %n", s.getTransfer_id(), s.getAccount_from().getUser().getUsername()+"|"+s.getAccount_from().getAccount_id(),s.getAccount_to().getUser().getUsername()+"|"+s.getAccount_to().getAccount_id(), s.getAmount()));
+            System.out.println("--------------------------------------------------------------------------------------------");
         } else {
             System.out.println("No transfer history at the moment");
         }

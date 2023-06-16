@@ -123,9 +123,13 @@ public class App {
                 return;
             }
             List<Transfer> transfers = accountService.getAllTransferByAccount(accountID);
-            int transferIdChoice = consoleService.promptForInt("\nPlease enter transfer ID to view details (0 to cancel)");
-            transfers = transfers.stream().filter(s -> s.getTransfer_id() == transferIdChoice).collect(Collectors.toList());
             consoleService.printTransferHistory(transfers);
+            int transferIdChoice = consoleService.promptForInt("\nPlease enter transfer ID to view details (0 to cancel): ");
+            if(checkForZero(transferIdChoice)){
+                return;
+            }
+            transfers = transfers.stream().filter(s -> s.getTransfer_id() == transferIdChoice).collect(Collectors.toList());
+            consoleService.printTransferDetails(transfers.get(0));
         }
 
 	private void viewPendingRequests() {

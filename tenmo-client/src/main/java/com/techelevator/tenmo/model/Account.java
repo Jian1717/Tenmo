@@ -9,4 +9,5 @@ import lombok.Setter;
 public class Account {
     private int account_id;
     private double balance;
+    private User user;
 }
