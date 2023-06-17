@@ -182,16 +182,16 @@ public class AccountController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("account/{id}/withdrawMoney")
     public Account subtractMoneyFromAccount(@PathVariable int id,
-                                      @RequestParam double amount){
-        double balance=accountService.getAccountByID(id).getBalance();
-        if(amount<=0){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Please enter positive value for amount.");
+                                      @RequestParam double amount) {
+        double balance = accountService.getAccountByID(id).getBalance();
+        if (amount <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Please enter positive value for amount.");
         }
-        if(balance<amount){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Not enough balance");
+        if (balance < amount) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not enough balance");
         }
-        balance=balance-amount;
-        return accountService.updateAccountBalance(id,balance);
+        balance = balance - amount;
+        return accountService.updateAccountBalance(id, balance);
     }
 
     /**verify current user are the owner for the account.*/

@@ -117,6 +117,13 @@ public class ConsoleService {
         System.out.printf(" %-20s  %-20s %n", account.getAccount_id(), account.getBalance());
         System.out.println("----------------------------------------------");
     }
+    public void printRequestAccounts(List<Account> accountList) {
+        System.out.println("----------------------------------------------\n" + " Account Requesting");
+        System.out.printf(" %-20s  %n", "Account ID");
+        System.out.println("----------------------------------------------");
+        accountList.forEach(s -> System.out.printf(" %-20s %n", s.getAccount_id()));
+        System.out.println("----------------------------------------------");
+    }
 
     public void printPendingTransfer(List<Transfer> transferList) {
         if (transferList.size() > 0) {

@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -105,16 +106,9 @@ public class App {
         AccountService accountService = new AccountService(currentUser);
         List<Account> accounts = accountService.getAccount();
         consoleService.printAllAccounts(accounts);
-       /* for (Account account : accounts) {
-            // display balance for each account even though i think
-            System.out.println("Account ID: " + account.getAccount_id());
-            System.out.println("Account Balance: " + account.getBalance());
-*/
-
     }
 
         private void viewTransferHistory() {
-		// TODO Auto-generated method stub
             List<Account> accountList= accountService.getAccount();
             consoleService.printAllAccounts(accountList);
             int accountID=consoleService.promptForInt("Please select an account id: ");
@@ -171,52 +165,43 @@ public class App {
     }
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
-
-
         List<Account> senderAccountList =accountService.getAccount();
         List<User> users=accountService.getListUsers();
-
-
         consoleService.printAllAccounts(senderAccountList);
         int senderAccountId =  consoleService.promptForInt("Enter which Account to send funds form: ");
         consoleService.printAllUser(users);
         int userId=consoleService.promptForInt("User ID: ");
-
-
         List<Account> recipientAccountList=accountService.getAccountByUserId(userId);
         consoleService.printAllAccounts(recipientAccountList);
-
         int recipientAccountId = consoleService.promptForInt("Enter the recipient's Account ID: ");
 
         double amount = consoleService.promptForBigDecimal("Enter the amount to transfer: ").doubleValue();
-
-        accountService.transferFunds(senderAccountId, recipientAccountId, amount);
-		
+        try {
+            Transfer transfer=accountService.transferFunds(senderAccountId,
+                    recipientAccountId, amount);
+            consoleService.printTransferDetails(transfer);
+        }catch (Exception e){
+           System.out.println(e.getMessage());
+        }
 	}
 
 	private void requestBucks() {
         List<Account> accountList =accountService.getAccount();
         List<User> userList = accountService.getListUsers();
-
-
         consoleService.printAllAccounts(accountList);
         int receiverAccountId =  consoleService.promptForInt("Enter which Account to add funds to: ");
-
         consoleService.printAllUser(userList);
-
         int userId=consoleService.promptForInt("Enter which user to request funds from by ID: ");
-
-
         List<Account> senderAccountList=accountService.getAccountByUserId(userId);
-        consoleService.printAllAccounts(senderAccountList);
-
+        consoleService.printRequestAccounts(senderAccountList);
         int senderAccountId = consoleService.promptForInt("Enter the senders Account ID: ");
-
-        double amount = consoleService.promptForBigDecimal("Enter the amount to transfer: ").doubleValue();
-
-        accountService.transferFunds( senderAccountId, receiverAccountId, amount);
-
+        double amount = consoleService.promptForBigDecimal("Enter the amount to request: ").doubleValue();
+        try {
+            Transfer transfer=accountService.transferFunds( senderAccountId, receiverAccountId, amount);
+            consoleService.printTransferDetails(transfer);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
 	}
 
     private void withdrawBucks() {
@@ -262,5 +247,8 @@ public class App {
     }
     private boolean checkForAccountID(int accountID, List<Account> accountList){
         return accountList.stream().filter(s->s.getAccount_id()==accountID).collect(Collectors.toList()).size()>0;
+    }
+    private boolean checkForTransferID(int transferID, List<Transfer> transferList){
+        return transferList.stream().filter(s->s.getTransfer_id()==transferID).collect(Collectors.toList()).size()>0;
     }
 }
