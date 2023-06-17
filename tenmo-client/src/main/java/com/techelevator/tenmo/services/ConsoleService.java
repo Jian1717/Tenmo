@@ -48,16 +48,24 @@ public class ConsoleService {
         System.out.println("5: Request TE bucks");
         System.out.println("6: Deposit TE bucks");
         System.out.println("7: Withdraw TE bucks");
+        System.out.println("8: Currency conversion menu");
+
         System.out.println("0: Exit");
         System.out.println();
     }
-
+    //added
+    public void printCurrencyConversionMenu(){
+        System.out.println();
+        System.out.println("1: View currency codes");
+        System.out.println("2: Exchange");
+        System.out.println("0: Exit");
+        System.out.println();
+    }
     public UserCredentials promptForCredentials() {
         String username = promptForString("Username: ");
         String password = promptForString("Password: ");
         return new UserCredentials(username, password);
     }
-
     public String promptForString(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();
@@ -83,6 +91,21 @@ public class ConsoleService {
                 System.out.println("Please enter a decimal number.");
             }
         }
+    }
+    //added
+    public String promptForCurrencyCode(String prompt) {
+        System.out.print(prompt);
+        String currencyCode = "";
+
+        while (currencyCode.isEmpty()) {
+        //    System.out.print(message);
+            currencyCode = scanner.nextLine().trim().toLowerCase();
+            if (currencyCode.isEmpty()) {
+                System.out.println("Currency code cannot be empty.");
+            }
+        }
+
+        return currencyCode;
     }
 
 

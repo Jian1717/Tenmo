@@ -9,14 +9,21 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AccountService {
     private static final String API_BASE_URL = "http://localhost:8080/";
     private RestTemplate restTemplate = new RestTemplate();
     private AuthenticatedUser authenticatedUser;
+    //
+   // String apiVersion = "1";
+ //   String date = "latest";
+   // String endpoint = "currencies/eur/jpy";
+    String exchangeUrl = "https://cdn.jsdelivr.net/gh/fawazahmed0/currency-api@1/latest/";
 
     public AccountService(AuthenticatedUser authenticatedUser) {
         this.restTemplate = new RestTemplate();
@@ -100,5 +107,54 @@ public class AccountService {
         HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(authenticatedUser.getToken());
         return new HttpEntity<>(headers);
+    }
+    //added
+    public void viewCurrencyCodes(){
+        String url = exchangeUrl + "currencies.json";
+
+        ResponseEntity<Map<String, String>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                ParameterizedTypeReference.forType(Map.class)
+        );
+        Map<String, String> currencyMap = response.getBody();
+        if (currencyMap != null) {
+            for (Map.Entry<String, String> entry : currencyMap.entrySet()) {
+                String code = entry.getKey();
+                String name = entry.getValue();
+                System.out.println("Currency code: " + code + "|| Currency name: " + name );
+            }
+        }
+    }
+    public void convertCurrency(BigDecimal amount, String sourceCurrencyCode, String targetCurrencyCode) {
+        String apiUrl = exchangeUrl + "/currencies/" + sourceCurrencyCode + "/" + targetCurrencyCode + ".json";
+        try {
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    apiUrl,
+                    HttpMethod.GET,
+                    null,
+                    ParameterizedTypeReference.forType(Map.class)
+            );
+
+            Map<String, Object> conversionMap = response.getBody();
+
+            if (conversionMap != null) {
+                String date = (String) conversionMap.get("date");
+                BigDecimal conversionRate = new BigDecimal(conversionMap.get(targetCurrencyCode).toString());
+
+                BigDecimal convertedAmount = amount.multiply(conversionRate);
+
+                System.out.println("Conversion result:");
+                System.out.println("Date: " + date);
+                System.out.println("Source Currency: " + sourceCurrencyCode);
+                System.out.println("Target Currency: " + targetCurrencyCode);
+                System.out.println("Amount: " + amount + " " + sourceCurrencyCode);
+                System.out.println("Conversion Rate: " + conversionRate);
+                System.out.println("Converted Amount: " + convertedAmount + " " + targetCurrencyCode);
+            }
+        }catch (Exception e){
+            System.out.println("An error occurred while fetching conversion data. Please check you're entering a valid currency code");
+        }
     }
 }

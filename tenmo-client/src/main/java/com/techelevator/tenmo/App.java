@@ -4,14 +4,8 @@ import com.techelevator.tenmo.model.*;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.ConsoleService;
-import com.techelevator.util.BasicLogger;
-import org.springframework.http.*;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestClientResponseException;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,6 +18,7 @@ public class App {
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private AuthenticatedUser currentUser;
     private AccountService accountService;
+
     public static void main(String[] args) {
         App app = new App();
         app.run();
@@ -36,6 +31,7 @@ public class App {
             mainMenu();
         }
     }
+
     private void loginMenu() {
         int menuSelection = -1;
         while (menuSelection != 0 && currentUser == null) {
@@ -67,8 +63,8 @@ public class App {
         currentUser = authenticationService.login(credentials);
         if (currentUser == null) {
             consoleService.printErrorMessage();
-        }else {
-            accountService=new AccountService(currentUser);
+        } else {
+            accountService = new AccountService(currentUser);
         }
     }
 
@@ -91,6 +87,27 @@ public class App {
                 depositBucks();
             } else if (menuSelection == 7) {
                 withdrawBucks();
+            } else if (menuSelection == 8) {
+                currencyConversionMenu();
+            } else if (menuSelection == 0) {
+                continue;
+            } else {
+                System.out.println("Invalid Selection");
+            }
+            consoleService.pause();
+        }
+    }
+    // Added
+    private void currencyConversionMenu() {
+        int menuSelection = -1;
+        while (menuSelection != 0) {
+            consoleService.printCurrencyConversionMenu();
+            menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
+            if (menuSelection == 1) {
+                viewCurrencyCodes();
+            }
+            else if  (menuSelection == 2) {
+                convertCurrency();
             } else if (menuSelection == 0) {
                 continue;
             } else {
@@ -100,155 +117,167 @@ public class App {
         }
     }
 
-
-
-    private void viewCurrentBalance() {  //still working on it -ezequiel
+    private void viewCurrentBalance() {
         AccountService accountService = new AccountService(currentUser);
         List<Account> accounts = accountService.getAccount();
         consoleService.printAllAccounts(accounts);
     }
 
-        private void viewTransferHistory() {
-            List<Account> accountList= accountService.getAccount();
-            consoleService.printAllAccounts(accountList);
-            int accountID=consoleService.promptForInt("Please select an account id: ");
-            if(!checkForAccountID(accountID,accountList)){
-                System.out.println("Invalid account ID");
-                return;
-            }
-            List<Transfer> transfers = accountService.getAllTransferByAccount(accountID);
-            consoleService.printTransferHistory(transfers);
-            int transferIdChoice = consoleService.promptForInt("\nPlease enter transfer ID to view details (0 to cancel): ");
-            if(checkForZero(transferIdChoice)){
-                return;
-            }
-            transfers = transfers.stream().filter(s -> s.getTransfer_id() == transferIdChoice).collect(Collectors.toList());
-            consoleService.printTransferDetails(transfers.get(0));
-        }
-
-	private void viewPendingRequests() {
-        String description="";
-        List<Account> accountList= accountService.getAccount();
+    private void viewTransferHistory() {
+        List<Account> accountList = accountService.getAccount();
         consoleService.printAllAccounts(accountList);
-        int accountID=consoleService.promptForInt("Please select an account id: ");
-        if(!checkForAccountID(accountID,accountList)){
+        int accountID = consoleService.promptForInt("Please select an account id: ");
+        if (!checkForAccountID(accountID, accountList)) {
+            System.out.println("Invalid account ID");
+            return;
+        }
+        List<Transfer> transfers = accountService.getAllTransferByAccount(accountID);
+        consoleService.printTransferHistory(transfers);
+        int transferIdChoice = consoleService.promptForInt("\nPlease enter transfer ID to view details (0 to cancel): ");
+        if (checkForZero(transferIdChoice)) {
+            return;
+        }
+        transfers = transfers.stream().filter(s -> s.getTransfer_id() == transferIdChoice).collect(Collectors.toList());
+        consoleService.printTransferDetails(transfers.get(0));
+    }
+
+    private void viewPendingRequests() {
+        String description = "";
+        List<Account> accountList = accountService.getAccount();
+        consoleService.printAllAccounts(accountList);
+        int accountID = consoleService.promptForInt("Please select an account id: ");
+        if (!checkForAccountID(accountID, accountList)) {
             System.out.println("Invalid account ID");
             return;
         }
         List<Transfer> transferList = accountService.getAllTransferByAccount(accountID);
-        transferList=accountService.getTransferByTransferStatusAndTransferType(transferList,"Pending","Request");
-        transferList=transferList.stream().filter(s->s.getAccount_from().getAccount_id()==accountID).collect(Collectors.toList());
+        transferList = accountService.getTransferByTransferStatusAndTransferType(transferList, "Pending", "Request");
+        transferList = transferList.stream().filter(s -> s.getAccount_from().getAccount_id() == accountID).collect(Collectors.toList());
         consoleService.printPendingTransfer(transferList);
-        if(transferList.size()==0){
+        if (transferList.size() == 0) {
             return;
         }
-        int transferID=consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
-        if(checkForZero(transferID)){
+        int transferID = consoleService.promptForInt("Please enter transfer ID to approve/reject (0 to cancel): ");
+        if (checkForZero(transferID)) {
             return;
         }
         consoleService.printApproveOrReject();
-        int userChoice=consoleService.promptForInt("Please choose an option: ");
+        int userChoice = consoleService.promptForInt("Please choose an option: ");
         try {
-        switch (userChoice){
-            case 1:
-                description="Approved";
-                consoleService.printTransferDetails(accountService.comfirmtransfer(transferID,description));
-                break;
-            case 2:
-                description="Rejected";
-                consoleService.printTransferDetails(accountService.comfirmtransfer(transferID,description));
-                break;
-        }
-        }catch (Exception e){
+            switch (userChoice) {
+                case 1:
+                    description = "Approved";
+                    consoleService.printTransferDetails(accountService.comfirmtransfer(transferID, description));
+                    break;
+                case 2:
+                    description = "Rejected";
+                    consoleService.printTransferDetails(accountService.comfirmtransfer(transferID, description));
+                    break;
+            }
+        } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
     }
 
-	private void sendBucks() {
-        List<Account> senderAccountList =accountService.getAccount();
-        List<User> users=accountService.getListUsers();
+    private void sendBucks() {
+        List<Account> senderAccountList = accountService.getAccount();
+        List<User> users = accountService.getListUsers();
         consoleService.printAllAccounts(senderAccountList);
-        int senderAccountId =  consoleService.promptForInt("Enter which Account to send funds form: ");
+        int senderAccountId = consoleService.promptForInt("Enter which Account to send funds form: ");
         consoleService.printAllUser(users);
-        int userId=consoleService.promptForInt("User ID: ");
-        List<Account> recipientAccountList=accountService.getAccountByUserId(userId);
+        int userId = consoleService.promptForInt("User ID: ");
+        List<Account> recipientAccountList = accountService.getAccountByUserId(userId);
         consoleService.printAllAccounts(recipientAccountList);
         int recipientAccountId = consoleService.promptForInt("Enter the recipient's Account ID: ");
 
         double amount = consoleService.promptForBigDecimal("Enter the amount to transfer: ").doubleValue();
         try {
-            Transfer transfer=accountService.transferFunds(senderAccountId,
+            Transfer transfer = accountService.transferFunds(senderAccountId,
                     recipientAccountId, amount);
             consoleService.printTransferDetails(transfer);
-        }catch (Exception e){
-           System.out.println(e.getMessage());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
         }
-	}
+    }
 
-	private void requestBucks() {
-        List<Account> accountList =accountService.getAccount();
+    private void requestBucks() {
+        List<Account> accountList = accountService.getAccount();
         List<User> userList = accountService.getListUsers();
         consoleService.printAllAccounts(accountList);
-        int receiverAccountId =  consoleService.promptForInt("Enter which Account to add funds to: ");
+        int receiverAccountId = consoleService.promptForInt("Enter which Account to add funds to: ");
         consoleService.printAllUser(userList);
-        int userId=consoleService.promptForInt("Enter which user to request funds from by ID: ");
-        List<Account> senderAccountList=accountService.getAccountByUserId(userId);
+        int userId = consoleService.promptForInt("Enter which user to request funds from by ID: ");
+        List<Account> senderAccountList = accountService.getAccountByUserId(userId);
         consoleService.printRequestAccounts(senderAccountList);
         int senderAccountId = consoleService.promptForInt("Enter the senders Account ID: ");
         double amount = consoleService.promptForBigDecimal("Enter the amount to request: ").doubleValue();
         try {
-            Transfer transfer=accountService.transferFunds( senderAccountId, receiverAccountId, amount);
+            Transfer transfer = accountService.transferFunds(senderAccountId, receiverAccountId, amount);
             consoleService.printTransferDetails(transfer);
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-	}
+    }
 
     private void withdrawBucks() {
-        List<Account> accountList= accountService.getAccount();
+        List<Account> accountList = accountService.getAccount();
         consoleService.printAllAccounts(accountList);
-        int accountID=consoleService.promptForInt("Please select an account id (0 to cancel): ");
-        if(checkForZero(accountID)){
+        int accountID = consoleService.promptForInt("Please select an account id (0 to cancel): ");
+        if (checkForZero(accountID)) {
             return;
         }
-        if(!checkForAccountID(accountID,accountList)){
+        if (!checkForAccountID(accountID, accountList)) {
             System.out.println("Invalid account ID");
             return;
         }
         double amount = consoleService.promptForBigDecimal("Enter withdraw amount: ").doubleValue();
         try {
-           accountService.withdrawMoney(accountID,amount);
-        }catch (Exception e){
+            accountService.withdrawMoney(accountID, amount);
+        } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
     }
 
     private void depositBucks() {
-        List<Account> accountList= accountService.getAccount();
+        List<Account> accountList = accountService.getAccount();
         consoleService.printAllAccounts(accountList);
-        int accountID=consoleService.promptForInt("Please select an account id (0 to cancel): ");
-        if(checkForZero(accountID)){
+        int accountID = consoleService.promptForInt("Please select an account id (0 to cancel): ");
+        if (checkForZero(accountID)) {
             return;
         }
-        if(!checkForAccountID(accountID,accountList)){
+        if (!checkForAccountID(accountID, accountList)) {
             System.out.println("Invalid account ID");
             return;
         }
         double amount = consoleService.promptForBigDecimal("Enter deposit amount: ").doubleValue();
         try {
-            accountService.depositMoney(accountID,amount);
-        }catch (Exception e){
+            accountService.depositMoney(accountID, amount);
+        } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
     }
 
-    private boolean checkForZero(double number){
-        return number==0;
+    private boolean checkForZero(double number) {
+        return number == 0;
     }
-    private boolean checkForAccountID(int accountID, List<Account> accountList){
-        return accountList.stream().filter(s->s.getAccount_id()==accountID).collect(Collectors.toList()).size()>0;
+
+    private boolean checkForAccountID(int accountID, List<Account> accountList) {
+        return accountList.stream().filter(s -> s.getAccount_id() == accountID).collect(Collectors.toList()).size() > 0;
     }
-    private boolean checkForTransferID(int transferID, List<Transfer> transferList){
-        return transferList.stream().filter(s->s.getTransfer_id()==transferID).collect(Collectors.toList()).size()>0;
+
+    private boolean checkForTransferID(int transferID, List<Transfer> transferList) {
+        return transferList.stream().filter(s -> s.getTransfer_id() == transferID).collect(Collectors.toList()).size() > 0;
+    }
+
+    private void viewCurrencyCodes() {
+        accountService.viewCurrencyCodes();
+
+
+    }
+    private void convertCurrency(){
+        String sourceCurrency = consoleService.promptForCurrencyCode("Enter source currency: ");
+        String targetCurrency = consoleService.promptForCurrencyCode("Enter target currency: ");
+        BigDecimal amount = consoleService.promptForBigDecimal("Enter the amount: ");
+        accountService.convertCurrency(amount, sourceCurrency, targetCurrency);
     }
 }
