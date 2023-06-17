@@ -68,7 +68,16 @@ public class ConsoleService {
     }
     public String promptForString(String prompt) {
         System.out.print(prompt);
-        return scanner.nextLine();
+        try {
+            String input = scanner.nextLine();
+            if (input.isEmpty()) {
+                throw new IllegalArgumentException("Input cannot be empty.");
+            }
+            return input;
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+            return promptForString(prompt);
+        }
     }
 
     public int promptForInt(String prompt) {
