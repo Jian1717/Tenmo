@@ -71,8 +71,8 @@ public class App {
 
     private void mainMenu() {
         int menuSelection = -1;
+        consoleService.printMainMenu();
         while (menuSelection != 0) {
-            consoleService.printMainMenu();
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
             if (menuSelection == 1) {
                 viewCurrentBalance();
@@ -98,6 +98,7 @@ public class App {
                 System.out.println("Invalid Selection");
             }
             consoleService.pause();
+            consoleService.printMainMenu();
         }
     }
     // Added
@@ -136,11 +137,15 @@ public class App {
         }
         List<Transfer> transfers = accountService.getAllTransferByAccount(accountID);
         consoleService.printTransferHistory(transfers);
+        if(transfers.isEmpty()){
+            return;
+        }
         int transferIdChoice = consoleService.promptForInt("\nPlease enter transfer ID to view details (0 to cancel): ");
         if (checkForZero(transferIdChoice)) {
             return;
         }
         transfers = transfers.stream().filter(s -> s.getTransfer_id() == transferIdChoice).collect(Collectors.toList());
+
         consoleService.printTransferDetails(transfers.get(0));
     }
 
