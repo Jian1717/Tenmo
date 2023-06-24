@@ -41,10 +41,8 @@ public class AccountService {
     }
 
     public Account getAccount(int accountId) {
-        String url = API_BASE_URL + "user/account";
-        String parameter = "account_id=" + accountId;
-
-        ResponseEntity<Account> response = restTemplate.exchange(url + "?" + parameter, HttpMethod.GET,makeAuthEntity(), Account.class);
+        String url = API_BASE_URL + "account/"+accountId;
+        ResponseEntity<Account> response = restTemplate.exchange(url, HttpMethod.GET,makeAuthEntity(), Account.class);
         Account account = response.getBody();
 
         return account;
@@ -91,8 +89,7 @@ public class AccountService {
     public Account depositMoney(int accountID,double amount){
         String url = API_BASE_URL + "account/"+accountID+"/depositMoney?amount="+amount;
         ResponseEntity<Account> response = restTemplate.exchange(url, HttpMethod.PUT,makeAuthEntity(),Account.class);
-        Account updateAccount = response.getBody();
-        return updateAccount;
+        return response.getBody();
     }
     public Account withdrawMoney(int accountID,double amount){
         String url = API_BASE_URL + "account/"+accountID+"/withdrawMoney?amount="+amount;
@@ -100,13 +97,13 @@ public class AccountService {
         Account updateAccount = response.getBody();
         return updateAccount;
     }
+    public Account createNewAccount(){
+        String url = API_BASE_URL + "user/createNewAccount";
+        ResponseEntity<Account> response = restTemplate.exchange(url, HttpMethod.POST,makeAuthEntity(),Account.class);
+        return response.getBody();
+    }
     public List<Transfer> getTransferByTransferStatusAndTransferType(List<Transfer> transferList , String transferStatus, String transferType ){
         return transferList.stream().filter(s->s.getTransferStatus().getDescription().equals(transferStatus)&&s.getTransferType().getDescription().equals(transferType)).collect(Collectors.toList());
-    }
-    private HttpEntity<Void> makeAuthEntity() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(authenticatedUser.getToken());
-        return new HttpEntity<>(headers);
     }
     //added
     public void viewCurrencyCodes(){
@@ -156,5 +153,10 @@ public class AccountService {
         }catch (Exception e){
             System.out.println("An error occurred while fetching conversion data. Please check you're entering a valid currency code");
         }
+    }
+    private HttpEntity<Void> makeAuthEntity() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authenticatedUser.getToken());
+        return new HttpEntity<>(headers);
     }
 }

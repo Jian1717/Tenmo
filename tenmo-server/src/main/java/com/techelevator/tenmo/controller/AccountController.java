@@ -193,7 +193,6 @@ public class AccountController {
         balance = balance - amount;
         return accountService.updateAccountBalance(id, balance);
     }
-
     /**verify current user are the owner for the account.*/
     private boolean verifyCurrentUser(Account account, Principal principal){
         return account.getUser().getUsername().equals(principal.getName());

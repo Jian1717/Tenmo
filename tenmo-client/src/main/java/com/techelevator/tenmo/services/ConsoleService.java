@@ -48,7 +48,8 @@ public class ConsoleService {
         System.out.println("5: Request TE bucks");
         System.out.println("6: Deposit TE bucks");
         System.out.println("7: Withdraw TE bucks");
-        System.out.println("8: Currency conversion menu");
+        System.out.println("8: Create new account");
+        System.out.println("9: Currency conversion menu");
 
         System.out.println("0: Exit");
         System.out.println();
@@ -124,6 +125,7 @@ public class ConsoleService {
     }
 
     public void printAllUser(List<User> userList) {
+        System.out.println();
         System.out.println("-------------------------------------------\n" +
                 "Users\n" +
                 "ID          Name\n" +
@@ -135,14 +137,16 @@ public class ConsoleService {
     }
 
     public void printAllAccounts(List<Account> accountList) {
+        System.out.println();
         System.out.println("----------------------------------------------\n" + " Account");
         System.out.printf(" %-20s  %-20s  %n", "Account ID", "Balance");
-        System.out.println("-------------------------------------------");
+        System.out.println("----------------------------------------------");
         accountList.forEach(s -> System.out.printf(" %-20s  %-20s %n", s.getAccount_id(), s.getBalance()));
         System.out.println("----------------------------------------------");
     }
 
     public void printAccount(Account account) {
+        System.out.println();
         System.out.println("----------------------------------------------\n" + " Account");
         System.out.printf(" %-20s  %-20s  %n", "Account ID", "Balance");
         System.out.println("----------------------------------------------");
@@ -150,6 +154,7 @@ public class ConsoleService {
         System.out.println("----------------------------------------------");
     }
     public void printRequestAccounts(List<Account> accountList) {
+        System.out.println();
         System.out.println("----------------------------------------------\n" + " Account Requesting");
         System.out.printf(" %-20s  %n", "Account ID");
         System.out.println("----------------------------------------------");
@@ -158,6 +163,7 @@ public class ConsoleService {
     }
 
     public void printPendingTransfer(List<Transfer> transferList) {
+        System.out.println();
         if (transferList.size() > 0) {
             System.out.println("----------------------------------------------\n" + " Pending Transfer");
             System.out.printf(" %-20s  %-20s  %-20s %n", "ID:", "To:", "Amount:");
@@ -170,6 +176,7 @@ public class ConsoleService {
     }
 
     public void printApproveOrReject() {
+        System.out.println();
         System.out.println("1: Approve");
         System.out.println("2: Reject");
         System.out.println("0: Don't approve or reject");
@@ -177,6 +184,7 @@ public class ConsoleService {
     }
 
     public void printTransferDetails(Transfer transfer) {
+        System.out.println();
         System.out.println("----------------------------------------------");
         System.out.println("Transfer Detail");
         System.out.println("----------------------------------------------");
@@ -194,6 +202,7 @@ public class ConsoleService {
 
 
     public void printTransferHistory(List<Transfer> transferList) {
+        System.out.println();
         if (transferList.size() > 0) {
             System.out.println("--------------------------------------------------------------------------------------------\n");
             System.out.println("Transfer\n");

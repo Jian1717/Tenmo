@@ -34,6 +34,7 @@ public class App {
 
     private void loginMenu() {
         int menuSelection = -1;
+        currentUser=null;
         while (menuSelection != 0 && currentUser == null) {
             consoleService.printLoginMenu();
             menuSelection = consoleService.promptForMenuSelection("Please choose an option: ");
@@ -88,9 +89,11 @@ public class App {
             } else if (menuSelection == 7) {
                 withdrawBucks();
             } else if (menuSelection == 8) {
+                createNewAccount();
+            } else if (menuSelection == 9) {
                 currencyConversionMenu();
             } else if (menuSelection == 0) {
-                continue;
+                loginMenu();
             } else {
                 System.out.println("Invalid Selection");
             }
@@ -233,6 +236,7 @@ public class App {
         double amount = consoleService.promptForBigDecimal("Enter withdraw amount: ").doubleValue();
         try {
             accountService.withdrawMoney(accountID, amount);
+            consoleService.printAccount(accountService.getAccount(accountID));
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
@@ -252,6 +256,7 @@ public class App {
         double amount = consoleService.promptForBigDecimal("Enter deposit amount: ").doubleValue();
         try {
             accountService.depositMoney(accountID, amount);
+            consoleService.printAccount(accountService.getAccount(accountID));
         } catch (Exception e) {
             System.out.println(e.getLocalizedMessage());
         }
@@ -271,8 +276,22 @@ public class App {
 
     private void viewCurrencyCodes() {
         accountService.viewCurrencyCodes();
+    }
 
+    private void createNewAccount(){
+        String userInput = null;
 
+        while (true){
+           userInput=consoleService.promptForString("Would you like to create a new account? Type Yes to confirm, No to cancel : ");
+           if(userInput.equalsIgnoreCase("yes")){
+               consoleService.printAccount(accountService.createNewAccount());
+               return;
+           }
+           if(userInput.equalsIgnoreCase("no")){
+               return;
+           }
+           System.out.println("Invalid Input");
+        }
     }
     private void convertCurrency(){
         String sourceCurrency = consoleService.promptForCurrencyCode("Enter source currency: ");
